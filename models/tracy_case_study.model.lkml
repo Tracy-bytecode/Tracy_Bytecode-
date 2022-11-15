@@ -14,6 +14,7 @@ datagroup: tracy_casse_study_default_datagroup {
 }
 
 
+
 persist_with: tracy_casse_study_default_datagroup
 
 # Explores allow you to join together different views (database tables) based on the
@@ -47,43 +48,63 @@ explore: order_items {
     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
     relationship: many_to_one
   }
+
+  join: user_fact {
+    type: left_outer
+    sql_on: ${user_fact.order_items_user_id} = ${order_items.user_id} ;;
+    relationship: many_to_one
+  }
+
+
+ join: events {
+  type: left_outer
+  sql_on: ${events.user_id} = ${users.id} ;;
+  relationship: many_to_one
+ }
 }
+
+
+
 
 # To create more sophisticated Explores that involve multiple views, you can use the join parameter.
 # Typically, join parameters require that you define the join type, join relationship, and a sql_on clause.
 # Each joined view also needs to define a primary key.
 
-explore: distribution_centers {}
+# explore: distribution_centers {}
 
-explore: products {
-  join: distribution_centers {
-    type: left_outer
-    sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
-    relationship: many_to_one
-  }
+# explore: products {
+#   join: distribution_centers {
+#     type: left_outer
+#     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
+#     relationship: many_to_one
+#   }
+# }
+
+
+
+# explore: inventory_items {
+#   join: products {
+#     type: left_outer
+#     sql_on: ${inventory_items.product_id} = ${products.id} ;;
+#     relationship: many_to_one
+#   }
+
+#   join: distribution_centers {
+#     type: left_outer
+#     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
+#     relationship: many_to_one
+#   }
+# }
+
+explore: users {
+  label: "Customer"
 }
 
-explore: events {
-  join: users {
-    type: left_outer
-    sql_on: ${events.user_id} = ${users.id} ;;
-    relationship: many_to_one
 
- }
-}
-
-explore: inventory_items {
-  join: products {
-    type: left_outer
-    sql_on: ${inventory_items.product_id} = ${products.id} ;;
-    relationship: many_to_one
-  }
-
-  join: distribution_centers {
-    type: left_outer
-    sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
-    relationship: many_to_one
-  }
-}
-
-explore: users {}
+# explore: events {
+#   join: users {
+#     type: left_outer
+#     sql_on: ${events.user_id} = ${users.id} ;;
+#     relationship: many_to_one
+#   }
+# }

@@ -22,6 +22,15 @@ view: products {
   dimension: brand {
     type: string
     sql: ${TABLE}.brand ;;
+    drill_fields: [category]
+    link: {
+      label: "Google"
+      url: "http://www.google.com/search?q={{ value }}"
+      }
+    link: {
+      label: "Facebook"
+      url: "https://www.facebook.com/"
+      }
   }
 
   dimension: category {

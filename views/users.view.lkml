@@ -8,6 +8,7 @@ view: users {
   # This primary key is the unique key for this table in the underlying database.
   # You need to define a primary key in a view in order to join to other views.
 
+
   dimension: id {
     primary_key: yes
     type: number
@@ -25,19 +26,22 @@ view: users {
     sql: ${TABLE}.age ;;
   }
 
+  dimension: age_group {
+    type: string
+    sql:
+    CASE
+    WHEN ${age} >=15 and ${age}<=25 then "15-25 "
+    WHEN ${age} >= 26 and ${age}<= 35 then " 26-35"
+    WHEN ${age} >= 36 and ${age}<= 50 then " 36-50"
+    WHEN ${age}>= 51 and ${age} <= 65 then " 51-65"
+    WHEN ${age}>= 66  then "66 +"
+    Else "undefined" END;;
+  }
+
   # A measure is a field that uses a SQL aggregate function. Here are defined sum and average
   # measures for this dimension, but you can also add measures of many different aggregates.
   # Click on the type parameter to see all the options in the Quick Help panel on the right.
 
-  measure: total_age {
-    type: sum
-    sql: ${age} ;;
-  }
-
-  measure: average_age {
-    type: average
-    sql: ${age} ;;
-  }
 
   dimension: city {
     type: string
@@ -105,6 +109,7 @@ view: users {
   dimension: state {
     type: string
     sql: ${TABLE}.state ;;
+    map_layer_name: us_states
   }
 
   dimension: street_address {
@@ -115,6 +120,12 @@ view: users {
   dimension: traffic_source {
     type: string
     sql: ${TABLE}.traffic_source ;;
+  }
+
+  dimension: is_new_customer {
+    type: yesno
+    sql: DATE_DIFF(CURRENT_DATE(), ${created_date}, DAY) < 90 ;;
+
   }
 
   measure: count {

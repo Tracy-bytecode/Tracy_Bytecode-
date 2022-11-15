@@ -94,6 +94,8 @@ view: events {
     sql: ${TABLE}.traffic_source ;;
   }
 
+
+
   dimension: uri {
     type: string
     sql: ${TABLE}.uri ;;
