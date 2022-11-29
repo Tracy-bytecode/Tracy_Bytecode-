@@ -96,9 +96,9 @@ explore: order_items {
 #   }
 # }
 
-explore: users {
-  label: "Customer"
-}
+# explore: users {
+#   label: "Customer"
+# }
 
 
 # explore: events {
@@ -108,3 +108,17 @@ explore: users {
 #     relationship: many_to_one
 #   }
 # }
+
+explore: order_users {}
+
+explore: products {
+  join: order_items {
+    type: left_outer
+    sql_on: ${order_items.product_id} = ${products.id} ;;
+    relationship: one_to_many
+  }
+  fields: [ALL_FIELDS*,
+    -order_items.total_cost,-order_items.avg_cost]
+}
+
+explore: brand_comparison {}

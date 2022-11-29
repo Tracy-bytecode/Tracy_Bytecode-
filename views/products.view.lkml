@@ -15,6 +15,7 @@ view: products {
   }
 
 
+
   # Here's what a typical dimension looks like in LookML.
   # A dimension is a groupable field that can be used to filter query results.
   # This dimension will be called "Brand" in Explore.
@@ -24,14 +25,17 @@ view: products {
     sql: ${TABLE}.brand ;;
     drill_fields: [category]
     link: {
-      label: "Google"
+      label: "Brand-Google Search"
       url: "http://www.google.com/search?q={{ value }}"
       }
-    link: {
-      label: "Facebook"
-      url: "https://www.facebook.com/"
-      }
-  }
+     link: {
+     label: "Brand-Facebook"
+    # url: "https://www.facebook.com/"
+    url:"https://www.facebook.com/public?query={{value}}%20K&type=pages&init=dir&nomc=0"
+     }
+   }
+
+
 
   dimension: category {
     type: string
@@ -87,6 +91,8 @@ view: products {
     type: count
     drill_fields: [detail*]
   }
+
+
 
   # ----- Sets of fields for drilling ------
   set: detail {

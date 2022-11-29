@@ -33,6 +33,7 @@ view: order_items {
     sql: ${TABLE}.created_at ;;
   }
 
+
   dimension_group: delivered {
     type: time
     timeframes: [
@@ -247,16 +248,19 @@ measure: avg_lifetime_revenue {
     sql: ${total_sale_price}/${total_number_of_customers} ;;
     value_format_name: usd
     drill_fields: [users.age_group,users.gender,average_spend_percustomers]
+    # html: <font color="green">{{rendered_value}}</font> ;;
 
   }
 
 # Total Revenue
 
-  measure: total_revenue {
+   measure: total_revenue {
     type: sum
     sql: ${sale_price} ;;
     value_format_name: usd
-  }
+    # html: <font color="green">{{rendered_value}}</font> ;;
+ }
+
 
 
   measure: total_lifetime_revenue {
@@ -310,8 +314,8 @@ measure: repeat_customer {
 
 
 measure: Customer_Lifetime_Revenue {
-  type: string
-  sql: CASE
+type: string
+sql: CASE
 WHEN ${total_revenue}>=  0.00   and ${total_revenue} <=4.99 then   "$ 0,00 - $ 4.99"
 when ${total_revenue}>=  5.00   and ${total_revenue}  <=19.99 then  "$ 5.00 - $19.99"
 when ${total_revenue}>=  20.00   and ${total_revenue}  <=49.99 then "$ 20.00 - $49.99"
@@ -382,8 +386,6 @@ measure: customer_lifetime_orders {
   Else "undefined" END;;
 
 }
-
-#Customer Lifetime Revenue
 
 
 

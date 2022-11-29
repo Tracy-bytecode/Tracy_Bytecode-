@@ -86,6 +86,13 @@ view: users {
     sql: ${TABLE}.gender ;;
   }
 
+
+dimension: first_last_name {
+  type: string
+  sql: concat(${first_name},' ',${last_name});;
+}
+
+
   dimension: last_name {
     type: string
     sql: ${TABLE}.last_name ;;
@@ -127,6 +134,37 @@ view: users {
     sql: DATE_DIFF(CURRENT_DATE(), ${created_date}, DAY) < 90 ;;
 
   }
+
+  #days since customer sign up
+
+  dimension: days_since_customer_sign_up {
+    type: number
+    sql: DATE_DIFF(${order_items.created_date}, ${created_date}, DAY) ;;
+  }
+
+
+    #avg days since customer sign up
+  measure: avg_days_since_customer_sign_up {
+    type: average
+    sql: ${days_since_customer_sign_up} ;;
+    value_format_name: decimal_2
+  }
+
+#Month since customer sign up
+  dimension: month_since_customer_sign_up {
+    type: number
+    sql: DATE_DIFF(${order_items.created_date}, ${created_date}, MONTH) ;;
+  }
+
+    #Avg Month since customer sign up
+  measure: avg_month_since_customer_sign_up {
+    type: average
+    sql: ${month_since_customer_sign_up} ;;
+    value_format_name: decimal_2
+
+  }
+
+
 
   measure: count {
     type: count
