@@ -307,10 +307,10 @@ measure: is_active {
   # }
 
 # Repeat Customer
-measure: repeat_customer {
-  type: yesno
-  sql: ${order_count}>1 ;;
-}
+   measure: repeat_customer {
+     type: yesno
+    sql: ${order_count}>1 ;;
+   }
 
 
 measure: Customer_Lifetime_Revenue {

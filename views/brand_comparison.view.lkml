@@ -32,7 +32,7 @@ view: brand_comparison {
 
   dimension: is_compared_brand {
     type: yesno
-    sql: ${brand}=select_brand._parameter_value ;;
+    sql: ${brand}={{select_brand._parameter_value}} ;;
   }
 
   parameter: metric_selector {
@@ -78,5 +78,66 @@ view: brand_comparison {
     value_format_name: usd
 
 }
+
+measure: metric_base {
+  type: number
+  sql:
+  {% if metric_selector._parameter_value == 'total_gross_revenue'  %}
+  ${gross_revenue_selected_brand}
+  {% elsif metric_selector._parameter_value == 'order_count' %}
+  ${order_count_selected_brand}
+  {% else %}
+  null
+  {% endif %};;
+  value_format_name: decimal_2
+}
+
+  measure: metric_compared {
+    type: number
+    sql:
+      {% if metric_selector._parameter_value == 'total_gross_revenue'  %}
+      ${gross_revenue_other_brand}
+     {% elsif metric_selector._parameter_value == 'order_count' %}
+       ${order_count_other_brand}
+       {% else %}
+       null
+       {% endif %};;
+    value_format_name: decimal_2
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
