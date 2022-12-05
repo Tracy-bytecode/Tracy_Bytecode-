@@ -5,17 +5,39 @@ view: brand_comparison {
     explore_source: products {
       column: brand {}
       column: category {}
-      column: total_gross_revenue { field: order_items.total_gross_revenue }
+      column: total_revenue { field: order_items.total_revenue }
       column: order_count { field: order_items.order_count }
+      column: created_date { field: order_items.created_date }
     }
   }
+
+  # dimension: created_date {
+  #   description: ""
+  #   type: date
+  # }
+
+  dimension_group: created {
+    type: time
+    timeframes: [
+      raw,
+      time,
+      date,
+      week,
+      month,
+      month_name,
+      quarter,
+      year
+    ]
+    sql: ${TABLE}.created_date ;;
+  }
+
   dimension: brand {
     description: ""
   }
   dimension: category {
     description: ""
   }
-  dimension: total_gross_revenue {
+  dimension: total_revenue {
     description: ""
     value_format: "$#,##0.00"
     type: number
@@ -28,6 +50,14 @@ view: brand_comparison {
   parameter: select_brand {
     suggest_explore: products
     suggest_dimension: products.brand
+  }
+
+  dimension: brand_compare {
+    type: string
+    sql: case when {% condition select_brand %} ${brand} {% endcondition %}
+              then ${brand}
+              else 'Other Brands'
+           end ;;
   }
 
   dimension: is_compared_brand {
@@ -51,14 +81,14 @@ view: brand_comparison {
 
   measure: gross_revenue_selected_brand {
     type: sum
-    sql: ${total_gross_revenue} ;;
+    sql: ${total_revenue} ;;
     filters: [is_compared_brand: "Yes"]
     value_format_name: usd
   }
 
   measure: gross_revenue_other_brand {
     type: sum
-    sql: ${total_gross_revenue} ;;
+    sql: ${total_revenue} ;;
     filters: [is_compared_brand: "No"]
     value_format_name: usd
   }
