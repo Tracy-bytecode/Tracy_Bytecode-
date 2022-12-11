@@ -63,9 +63,7 @@ view: order_items {
     sql: ${TABLE}.order_id ;;
   }
 
-
-
-  dimension: product_id {
+ dimension: product_id {
     type: number
     # hidden: yes
     sql: ${TABLE}.product_id ;;
@@ -117,72 +115,55 @@ view: order_items {
   # measures for this dimension, but you can also add measures of many different aggregates.
   # Click on the type parameter to see all the options in the Quick Help panel on the right.
 
-
-# Total Sale Price
-
   measure: total_sale_price {
     type: sum
     sql: ${sale_price} ;;
+    description: "Total Sale Price"
     value_format_name: usd
   }
 
-# Average Sale Price
-
-  measure: average_sale_price {
+ measure: average_sale_price {
     type: average
     sql: ${sale_price} ;;
+    description: "Average Sale Price"
     value_format_name: usd
   }
 
-
-  #Average Lifetime Orders
-  # measure: average_lifetime_orders {
-  #   type: average
-  #   sql: ${order_id} ;;
-  # }
-
-
-  #Cumulative Total Sales
-
-  measure: cumulative_total_sales {
+ measure: cumulative_total_sales {
     type: running_total
     sql: ${total_sale_price} ;;
+    description: "Cumulative Total Sales"
     value_format_name: usd
   }
 
-  #Total Gross Revenue
-
-  measure: total_gross_revenue {
+ measure: total_gross_revenue {
     type: sum
     sql:  ${sale_price} ;;
     filters: [status: "Complete"]
+    description: "Total Gross Revenue"
     value_format_name: usd
 
   }
 
-  measure: avg_gross_revenue {
+ measure: avg_gross_revenue {
     type: average
     sql:  ${sale_price} ;;
     filters: [status: "Complete"]
     value_format_name: usd
+ }
 
-  }
-
-#Average Lifetime_Revenue
-
-measure: avg_lifetime_revenue {
+ measure: avg_lifetime_revenue {
   type: average
   sql: ${sale_price} ;;
   filters: [status: "complete"]
+  description: "Average Lifetime_Revenue"
   value_format_name: usd
-
-
-
 }
-  #Total_Cost
+
   measure: total_cost {
     type: sum
     sql: ${inventory_items.cost} ;;
+    description: "Total_Cost"
     value_format_name: usd
     filters: [status: "Complete"]
   }
@@ -194,37 +175,35 @@ measure: avg_lifetime_revenue {
     filters: [status: "Complete"]
   }
 
-  #Total Gross Margin Amount
-
   measure: total_gross_margin_amount {
     type: number
     sql: ${total_gross_revenue} - ${total_cost} ;;
+    description: "Total Gross Margin Amount"
     value_format_name: usd
     drill_fields: [products.brand,products.category,total_gross_margin_amount]
   }
 
-  #Average Gross Margin Amount
 
   measure: avg_gross_margin_amount {
     type: number
+    description: "Average Gross Margin Amount"
     sql: ${avg_gross_revenue} - ${avg_cost} ;;
     value_format_name: usd
   }
 
 
-#Gross Margin %
-
-  measure: gross_margin_percentage {
+ measure: gross_margin_percentage {
     type: number
+    description: "Gross Margin %"
     sql: SAFE_DIVIDE(${total_gross_margin_amount} , ${total_gross_revenue}) ;;
     value_format_name: percent_2
   }
 
-#Number of Items Returned
 
-  measure: number_of_items_returned {
+ measure: number_of_items_returned {
     type: count_distinct
     sql: ${order_item_id} ;;
+    description: "Number of Items Returned"
     filters: [status: "Returned"]
   }
 
@@ -234,142 +213,120 @@ measure: avg_lifetime_revenue {
 
   }
 
-#Item Return Rate Number of Items Returned / total number of items sold
-
   measure: item_return_rate {
     type: number
     sql: ${number_of_items_returned} /  ${total_number_of_items_sold} ;;
   }
 
-#Number of Customers Returning Item
+
   measure: number_of_customer_returning_item {
     type: count_distinct
     sql: ${user_id} ;;
+    description: "Number of Customers Returning Item"
     filters: [status: "Returned"]
   }
 
-
-
-#total number of customers
   measure: total_number_of_customers {
     type: count_distinct
+    description: "total number of customers"
     sql: ${user_id} ;;
   }
 
-#% of Users with Returns Number of Customer Returning Items / total number of customers
-
-  measure: percentage_of_users_returning {
+   measure: percentage_of_users_returning {
     type: number
     sql: ${number_of_customer_returning_item} / ${total_number_of_customers}  ;;
     value_format_name: percent_2
 
   }
 
-#Average Spend per Customer Total Sale Price / total number of customer
-  measure: average_spend_percustomers {
+ measure: average_spend_percustomers {
     type: number
     sql: ${total_sale_price}/${total_number_of_customers} ;;
     value_format_name: usd
     drill_fields: [users.age_group,users.gender,average_spend_percustomers]
-    # html: <font color="green">{{rendered_value}}</font> ;;
+    html: <font color="green">{{rendered_value}}</font> ;;
 
   }
 
-# Total Revenue
-
-   measure: total_revenue {
+ measure: total_revenue {
     type: sum
     sql: ${sale_price} ;;
+    description: " Total Revenue"
     value_format_name: usd
     # html: <font color="green">{{rendered_value}}</font> ;;
  }
 
-
-
   measure: total_lifetime_revenue {
     type: sum
     sql: ${sale_price} ;;
+    description: "total_lifetime_revenue"
     value_format_name: usd
   }
 
-  #First Order Date
   measure: first_order_date  {
     type: date
+    description: "First Order Date"
     sql: MIN(${TABLE}.created_at) ;;
   }
 
-
-#latest order date
-  measure: latest_order_date  {
+ measure: latest_order_date  {
     type: date
+    description: "latest order date"
     sql: MAX(${TABLE}.created_at) ;;
   }
 
 
- #Is Active
-measure: is_active {
+ measure: is_active {
   type: yesno
+  description: "Is Active users"
   sql: DATE_DIFF(CURRENT_DATE(), ${latest_order_date}, DAY) < 90 ;;
 
   }
 
-
-
-  #days Since_latest_Order
-  measure: days_since_latest_order {
+ measure: days_since_latest_order {
     type: number
+    description: "days Since_latest_Order"
     sql: DATE_DIFF(CURRENT_DATE(), ${latest_order_date}, DAY) ;;
 
   }
 
-  # #avg Since_latest_Order
-  # measure: avg_since_latest_order {
-  #   type: average
-  #   sql: DATE_DIFF(CURRENT_DATE(), ${latest_order_date}, DAY) ;;
-
-  # }
-
-# Repeat Customer
-   measure: repeat_customer {
+ measure: repeat_customer {
      type: yesno
+    description: "Repeat Customer"
     sql: ${order_count}>1 ;;
    }
 
-
-measure: Customer_Lifetime_Revenue {
-type: string
-sql: CASE
-WHEN ${total_revenue}>=  0.00   and ${total_revenue} <=4.99 then   "$ 0,00 - $ 4.99"
-when ${total_revenue}>=  5.00   and ${total_revenue}  <=19.99 then  "$ 5.00 - $19.99"
-when ${total_revenue}>=  20.00   and ${total_revenue}  <=49.99 then "$ 20.00 - $49.99"
-when ${total_revenue}>=  50.00   and ${total_revenue}  <=99.99 then  "$ 50.00 - $99.99"
-when ${total_revenue}>=  100.00   and ${total_revenue}  <=499.99 then"$ 100.00 - $499.99"
-when ${total_revenue}>=  500.00   and ${total_revenue}  <= 999.99 then"$ 500.00 - $999.99"
-when ${total_revenue}>=  1000.00  then "1000.00 +"
-Else "undefined" END;;
+  measure: Customer_Lifetime_Revenue {
+   type: string
+   description: "Customers_lifetime_revenue"
+   sql: CASE
+   WHEN ${total_revenue}>=  0.00   and ${total_revenue} <=4.99 then   "$ 0,00 - $ 4.99"
+   When ${total_revenue}>=  5.00   and ${total_revenue}  <=19.99 then  "$ 5.00 - $19.99"
+   When ${total_revenue}>=  20.00   and ${total_revenue}  <=49.99 then "$ 20.00 - $49.99"
+   When ${total_revenue}>=  50.00   and ${total_revenue}  <=99.99 then  "$ 50.00 - $99.99"
+   When ${total_revenue}>=  100.00   and ${total_revenue}  <=499.99 then"$ 100.00 - $499.99"
+   When ${total_revenue}>=  500.00   and ${total_revenue}  <= 999.99 then"$ 500.00 - $999.99"
+   When ${total_revenue}>=  1000.00  then "1000.00 +"
+   Else "undefined" END;;
 
 }
 
 
-
-
-
-  measure: count {
+measure: count {
     type: count
     drill_fields: [detail*]
   }
 
 
-
-#Customer Lifetime Orders
 measure: order_count {
   type: count_distinct
+  description: "Customer Lifetime Orders"
   sql: ${order_id} ;;
 }
 
-#Total Lifetime Orders
   measure: tottal_lifetime_orders {
     type: count_distinct
+    description: "Total Lifetime Orders"
     sql: ${order_id} ;;
   }
 
@@ -387,12 +344,7 @@ measure: customer_lifetime_orders {
 
 }
 
-
-
-
-
-  # ----- Sets of fields for drilling ------
-  set: detail {
+ set: detail {
     fields: [
       order_item_id,
       users.last_name,
