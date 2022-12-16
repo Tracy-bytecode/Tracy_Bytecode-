@@ -192,7 +192,7 @@ view: order_items {
   }
 
 
- measure: gross_margin_percentage {
+  measure: gross_margin_percentage {
     type: number
     description: "Gross Margin %"
     sql: SAFE_DIVIDE(${total_gross_margin_amount} , ${total_gross_revenue}) ;;
@@ -252,8 +252,8 @@ view: order_items {
     type: sum
     sql: ${sale_price} ;;
     description: " Total Revenue"
-    value_format_name: usd
-    # html: <font color="green">{{rendered_value}}</font> ;;
+    value_format_name: usd_0
+   # html: <font color="green">{{rendered_value}}</font> ;;
  }
 
   measure: total_lifetime_revenue {

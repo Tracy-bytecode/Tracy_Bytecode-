@@ -23,11 +23,11 @@ view: user_fact {
            ;;
   }
 
-  #Repeating Customer
+
 
   measure: repeating_customer {
     type: count_distinct
-    sql: CASE WHEN order_items_tottal_lifetime_orders>1
+     sql: CASE WHEN order_items_tottal_lifetime_orders>1
     then ${TABLE}.order_items_user_id else 0 end ;;
   }
 

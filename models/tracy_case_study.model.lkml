@@ -25,6 +25,8 @@ persist_with: tracy_casse_study_default_datagroup
 # To see the Explore you’re building, navigate to the Explore menu and select an Explore under "Tracy Casse Study"
 
 explore: order_items {
+  # sql_always_where: date_diff(date(order_items.created_at , 'America/New_York'), date(current_timestamp , 'America/New_York'), day) <= 1
+  # and date_diff(date(order_items.shipped_at,'America/New_York'), date(order_items.created_at, 'America/New_York'), day) >= 0 ;;
   join: users {
     type: left_outer
     sql_on: ${order_items.user_id} = ${users.id} ;;
@@ -33,7 +35,7 @@ explore: order_items {
 
 join: order_users {
   type: left_outer
-  sql_on: ${order_items.user_id}= ${order_users.user_id} ;;
+  sql_on: ${order_items.order_id}= ${order_users.order_id} ;;
   relationship: many_to_one
 }
 
@@ -60,7 +62,6 @@ join: order_users {
     sql_on: ${user_fact.order_items_user_id} = ${order_items.user_id} ;;
     relationship: many_to_one
   }
-
 
  join: events {
   type: left_outer
