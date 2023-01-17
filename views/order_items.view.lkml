@@ -15,6 +15,7 @@ view: order_items {
   }
 
 
+
   # Dates and timestamps can be represented in Looker using a dimension group of type: time.
   # Looker converts dates and timestamps to the specified timeframes within the dimension group.
 
@@ -101,6 +102,8 @@ view: order_items {
     sql: ${TABLE}.shipped_at ;;
   }
 
+
+
   dimension: user_id {
     type: number
     # hidden: yes
@@ -120,6 +123,7 @@ view: order_items {
     sql: ${sale_price} ;;
     description: "Total Sale Price"
     value_format_name: usd
+    # required_access_grants: [can_view_data]
   }
 
  measure: average_sale_price {
@@ -142,6 +146,7 @@ view: order_items {
     filters: [status: "Complete"]
     description: "Total Gross Revenue"
     value_format_name: usd
+    drill_fields: [products.brand,products.category,total_gross_revenue]
 
   }
 
@@ -218,8 +223,7 @@ view: order_items {
     sql: ${number_of_items_returned} /  ${total_number_of_items_sold} ;;
   }
 
-
-  measure: number_of_customer_returning_item {
+ measure: number_of_customer_returning_item {
     type: count_distinct
     sql: ${user_id} ;;
     description: "Number of Customers Returning Item"
@@ -319,15 +323,62 @@ measure: count {
 
 
 measure: order_count {
-  type: count_distinct
+  type: count
   description: "Customer Lifetime Orders"
-  sql: ${order_id} ;;
+ # sql: ${order_id} ;;
+  drill_fields: [order_id]
 }
+
+dimension: is_first_purchase_from_order_users  {
+  type: yesno
+  sql: ${order_users.is_first_purchase} ;;
+
+}
+
+measure: first_purchase_order_count {
+  type: count
+  drill_fields: [order_id]
+  #sql: ${order_id} ;;
+  filters: [is_first_purchase_from_order_users: "Yes"]
+}
+
+  measure: subsequent_purchase_order_count {
+    type: count
+    # sql: ${order_id} ;;
+    drill_fields: [order_id]
+    filters: [is_first_purchase_from_order_users: "No"]
+  }
+
+  measure: first_purchase_percent {
+    type: number
+    sql: ${first_purchase_order_count} / ${order_count}  ;;
+    value_format_name: percent_2
+  }
+
+  measure: subsequent_purchase_percent {
+    type: number
+    sql: ${subsequent_purchase_order_count} / ${order_count}  ;;
+    value_format_name: percent_2
+  }
+
 
   measure: tottal_lifetime_orders {
     type: count_distinct
     description: "Total Lifetime Orders"
     sql: ${order_id} ;;
+  }
+
+  measure: count_orders {
+    # type: count_distinct
+    sql: count(distinct order_id) ;;
+  }
+
+  measure: min_order_date {
+    sql: min(created_at) ;;
+  }
+
+  measure: max_order_date {
+    sql: max(created_at) ;;
   }
 
 

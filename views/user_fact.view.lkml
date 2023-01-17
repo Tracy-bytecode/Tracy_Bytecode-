@@ -1,90 +1,136 @@
 view: user_fact {
+
+# native derived table to capture summary level info about each customer, the number of orders he made,
+# the earliest and latest time items within each order were ordered, and the revenue generated from each order
+
   derived_table: {
-    sql: SELECT
-          order_items.user_id  AS order_items_user_id,
-                   order_items.status,
-          DATE_DIFF(CURRENT_DATE(), ( (DATE(MAX(order_items.created_at) , 'America/Los_Angeles')) ), DAY)  AS order_items_days_since_latest_order,
-          COALESCE(SUM(order_items.sale_price ), 0) AS order_items_total_lifetime_revenue,
-          COUNT(DISTINCT order_items.order_id ) AS order_items_tottal_lifetime_orders,
-
-          CASE
-  WHEN ( COUNT(DISTINCT order_items.order_id ) ) =1  then "1 Order"
-  WHEN ( COUNT(DISTINCT order_items.order_id ) ) = 2 then "2 Orders"
-  WHEN ( COUNT(DISTINCT order_items.order_id ) ) >=3 and ( COUNT(DISTINCT order_items.order_id ) )<=5 then "3-5 Orders"
-  WHEN ( COUNT(DISTINCT order_items.order_id ) ) >=6 and ( COUNT(DISTINCT order_items.order_id ) )<=9 then "6-9 Orders"
-  WHEN ( COUNT(DISTINCT order_items.order_id ) ) >= 10 then " 10 +"
-  Else "undefined" END AS order_items_customer_lifetime_orders,
-
-      FROM `looker-partners.thelook.order_items`
-
-           AS order_items
-      GROUP BY
-          1,2
-           ;;
+    explore_source: order_items {
+      column: user_id {}
+      column: count_orders {}
+      column: min_order_date {}
+      column: max_order_date {}
+      column: total_gross_revenue {}
+    }
   }
 
-
-
-  measure: repeating_customer {
-    type: count_distinct
-     sql: CASE WHEN order_items_tottal_lifetime_orders>1
-    then ${TABLE}.order_items_user_id else 0 end ;;
-  }
-
-
-
-  dimension: order_items_user_id {
-    type: number
-    sql: ${TABLE}.order_items_user_id ;;
+  dimension: user_id {
     primary_key: yes
+    description: "Unique identifier of the user or customer who made the order"
     hidden: yes
   }
 
 
-  measure: average_days_since_latest_order {
-    type: average
-    sql: ${TABLE}.order_items_days_since_latest_order ;;
-    view_label: "Order Items"
-    value_format_name: decimal_2
+dimension: count_orders {
+    type: number
+    sql: count_orders ;;
+    value_format_name: decimal_0
   }
 
-  dimension: customer_orders_group {
-    type: string
-    sql: ${TABLE}.order_items_customer_lifetime_orders ;;
-    view_label: "Order Items"
-  }
-
-  measure: returning_revenue {
-    type: sum
-    sql: CASE WHEN ${TABLE}.status="Returned"
-    then ${TABLE}.order_items_total_lifetime_revenue else 0 end ;;
-    value_format_name: usd
-  }
-
-  measure: average_lifetime_revenue {
-    type: average
-    sql: ${TABLE}.order_items_total_lifetime_revenue ;;
-    view_label: "Order Items"
-    value_format_name: usd
-  }
-
-  measure: average_lifetime_orders {
-    type: average
-    sql: ${TABLE}.order_items_tottal_lifetime_orders ;;
-    view_label: "Order Items"
-    value_format_name: decimal_2
-  }
-
-  dimension: customer_revenue_group {
-    label: "Customer Revenue Group"
+  dimension: count_orders_tiers {
+    description: "Distribution of customer across different number of orders"
+    label: "Number of Orders Groups"
     type: tier
-    tiers: [5,20,50,100,500,1000]
-    sql:  ${TABLE}.order_items_total_lifetime_revenue ;;
-    style:  integer
-    value_format: "$#,##0"
-    view_label: "Order Items"
+    tiers: [1, 2, 3, 6, 10]
+    sql: ${count_orders} ;;
+    style: integer
   }
 
+  dimension: revenue_tiers {
+    description: "Distribution of customer across different revenue brackets"
+    label: "Revenue Brackets"
+    type: tier
+    tiers: [5, 20, 50, 100, 500, 1000]
+    sql: total_gross_revenue ;;
+    style: integer
+    value_format_name: usd_0
+  }
 
+  dimension: is_active_user {
+    description: "A customer is active if purchased from the website within the last 90 days"
+    type: yesno
+    sql: date_diff(current_timestamp, max_order_date, day) <= 90 ;;
+  }
+
+  dimension: days_since_last_order {
+    description: "Number of days since the last order"
+    type: number
+    sql: date_diff(current_timestamp, max_order_date, day) ;;
+  }
+
+  dimension: is_repeat_customer {
+    description: "A Repeat Customer purchased from the website more than once"
+    type: yesno
+    sql: count_orders > 1;;
+  }
+
+  measure: average_days_since_last_order {
+    description: "Average number of days since the last order"
+    type: average
+    sql: date_diff(current_timestamp, max_order_date, day) ;;
+    value_format_name: decimal_0
+  }
+
+  measure: count_of_orders {
+    type: sum
+    sql: count_orders ;;
+    value_format_name: decimal_0
+  }
+
+  measure: average_count_of_orders {
+    type: average
+    sql: count_orders ;;
+    value_format_name: decimal_1
+  }
+
+  measure: min_order_dt {
+    description: "First Ordered"
+    sql: min(min_order_date) ;;
+  }
+
+  measure: max_order_dt {
+    description: "Last Ordered"
+    sql: max(max_order_date) ;;
+  }
+
+  measure: revenue {
+    description: "Total revenue from completed sales (canceled and returned orders excluded)"
+    type: sum
+    sql: ${TABLE}.total_gross_revenue ;;
+    value_format_name: usd_0
+  }
+
+  measure: average_revenue {
+    description: "Average revenue from completed sales (canceled and returned orders excluded)"
+    type: average
+    sql: total_gross_revenue ;;
+    value_format_name: usd
+  }
+
+ measure: count_repeat_customers {
+    description: "A Repeat Customer purchased from the website more than once"
+    type: count_distinct
+    sql: ${user_id};;
+    filters:[is_repeat_customer: "yes"]
+  }
+
+  measure: count_1_time_customers {
+    description: "A Repeat Customer purchased from the website more than once"
+    type: count_distinct
+    sql: ${user_id};;
+    filters:[is_repeat_customer: "no"]
+  }
+
+  measure: count_customers {
+    description: "A Repeat Customer purchased from the website more than once"
+    type: count_distinct
+    sql: ${user_id};;
+  }
+
+  measure: repeat_purchase_rate {
+    description: "Total number of customers who have purchased more than once by the total number of customers"
+    type: number
+    sql:  ${count_repeat_customers} /  nullif(${count_customers},0);;
+    value_format_name: percent_0
+  }
 
 }

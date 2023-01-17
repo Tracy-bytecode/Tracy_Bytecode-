@@ -5,6 +5,7 @@ connection: "looker_partner_demo"
 # include all the views
 include: "/views/**/*.view"
 
+
 # Datagroups define a caching policy for an Explore. To learn more,
 # use the Quick Help panel on the right to see documentation.
 
@@ -39,6 +40,7 @@ join: order_users {
   relationship: many_to_one
 }
 
+
   join: inventory_items {
     type: left_outer
     sql_on: ${order_items.inventory_item_id} = ${inventory_items.id} ;;
@@ -57,9 +59,15 @@ join: order_users {
     relationship: many_to_one
   }
 
+  # join: user_fact {
+  #   type: left_outer
+  #   sql_on: ${user_fact.order_items_user_id} = ${order_items.user_id} ;;
+  #   relationship: many_to_one
+  # }
+
   join: user_fact {
     type: left_outer
-    sql_on: ${user_fact.order_items_user_id} = ${order_items.user_id} ;;
+    sql_on: ${user_fact.user_id} = ${order_items.user_id} ;;
     relationship: many_to_one
   }
 
@@ -68,53 +76,9 @@ join: order_users {
   sql_on: ${events.user_id} = ${users.id} ;;
   relationship: many_to_one
  }
+
+
 }
-
-
-
-
-# To create more sophisticated Explores that involve multiple views, you can use the join parameter.
-# Typically, join parameters require that you define the join type, join relationship, and a sql_on clause.
-# Each joined view also needs to define a primary key.
-
-# explore: distribution_centers {}
-
-# explore: products {
-#   join: distribution_centers {
-#     type: left_outer
-#     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
-#     relationship: many_to_one
-#   }
-# }
-
-
-
-# explore: inventory_items {
-#   join: products {
-#     type: left_outer
-#     sql_on: ${inventory_items.product_id} = ${products.id} ;;
-#     relationship: many_to_one
-#   }
-
-#   join: distribution_centers {
-#     type: left_outer
-#     sql_on: ${products.distribution_center_id} = ${distribution_centers.id} ;;
-#     relationship: many_to_one
-#   }
-# }
-
-# explore: users {
-#   label: "Customer"
-# }
-
-
-# explore: events {
-#   join: users {
-#     type: left_outer
-#     sql_on: ${events.user_id} = ${users.id} ;;
-#     relationship: many_to_one
-#   }
-# }
 
 explore: order_users {}
 
@@ -124,8 +88,63 @@ explore: products {
     sql_on: ${order_items.product_id} = ${products.id} ;;
     relationship: one_to_many
   }
+  join: order_users {
+    type: left_outer
+    sql_on: ${order_items.order_id}= ${order_users.order_id} ;;
+    relationship: many_to_one
+  }
   fields: [ALL_FIELDS*,
     -order_items.total_cost,-order_items.avg_cost]
 }
 
 explore: brand_comparison {}
+
+#new requirement
+
+# access_grant: can_view_data {
+#   user_attribute: can_view
+#   allowed_values: ["finance"]
+# }
+
+      explore: new_order_items {
+       from: order_items
+
+  # access_filter: {
+  #   field: new_order_items.user_id
+  #   user_attribute: can_view
+  # }
+
+
+  join: users {
+    type: left_outer
+    sql_on: ${new_order_items.user_id} = ${users.id} ;;
+    relationship: many_to_one
+    fields: [users.age,users.first_name]
+  }
+
+  join: order_users {
+    type: left_outer
+    sql_on: ${new_order_items.order_id}= ${order_users.order_id} ;;
+    relationship: many_to_one
+  }sql_always_where:  DATE(new_order_items.created_at) > "2020-01-01";;
+
+  # conditionally_filter: {
+  #   filters: [status: "Complete"]
+  #   unless: [created_date]
+  # }
+
+ always_filter: {
+   filters: [new_order_items.created_date: "1 day"]
+ }
+  fields: [
+    ALL_FIELDS*,
+    -users.days_since_customer_sign_up,
+    -users.month_since_customer_sign_up,
+    -new_order_items.total_cost,
+    -new_order_items.avg_cost
+  ]
+}
+
+# explore: explore_reference {
+#   extends: [brand_comparison]
+# }
