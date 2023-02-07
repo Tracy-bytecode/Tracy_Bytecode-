@@ -87,12 +87,6 @@ view: users {
   }
 
 
-dimension: first_last_name {
-  type: string
-  sql: concat(${first_name},' ',${last_name});;
-}
-
-
   dimension: last_name {
     type: string
     sql: ${TABLE}.last_name ;;

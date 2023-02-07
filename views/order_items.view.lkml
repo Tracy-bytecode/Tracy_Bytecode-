@@ -335,25 +335,15 @@ dimension: is_first_purchase_from_order_users  {
 
 }
 
-measure: first_purchase_order_count {
-  type: count
-  drill_fields: [order_id]
-  #sql: ${order_id} ;;
-  filters: [is_first_purchase_from_order_users: "Yes"]
-}
 
-  measure: subsequent_purchase_order_count {
+ measure: subsequent_purchase_order_count {
     type: count
     # sql: ${order_id} ;;
     drill_fields: [order_id]
     filters: [is_first_purchase_from_order_users: "No"]
   }
 
-  measure: first_purchase_percent {
-    type: number
-    sql: ${first_purchase_order_count} / ${order_count}  ;;
-    value_format_name: percent_2
-  }
+
 
   measure: subsequent_purchase_percent {
     type: number

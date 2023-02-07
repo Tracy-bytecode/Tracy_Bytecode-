@@ -17,6 +17,7 @@ view: user_fact {
     primary_key: yes
     description: "Unique identifier of the user or customer who made the order"
     hidden: yes
+
   }
 
 
