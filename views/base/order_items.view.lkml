@@ -113,6 +113,19 @@ view: order_items {
     type: count
     drill_fields: [detail*]
   }
+  measure: spend_per_customer {
+    type: number
+    sql: ${total_sale_price}/nullif(${total_customers},0) ;;
+    value_format_name: usd
+  }
+  measure: total_customers {
+    type:count_distinct
+    sql: ${user_id} ;;
+  }
+  measure: total_orders {
+    type: count_distinct
+    sql: ${order_id} ;;
+  }
   measure: total_sale_price {
     type: sum
     sql: ${sale_price} ;;

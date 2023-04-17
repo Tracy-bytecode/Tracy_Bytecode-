@@ -15,6 +15,12 @@ view: users {
     sql: ${TABLE}.age ;;
   }
 
+  dimension: age_group {
+    type: tier
+    tiers: [15,25,35,50,65]
+    style: integer
+    sql: ${age} ;;
+  }
 
   dimension: city {
     type: string
@@ -39,6 +45,11 @@ view: users {
       year
     ]
     sql: ${TABLE}.created_at ;;
+  }
+
+  dimension: created_last_90_days{
+    type: yesno
+    sql: date_diff(current_date, ${created_date},day)<=90 ;;
   }
 
   dimension: email {
@@ -103,6 +114,7 @@ view: users {
   }
 
   measure: total_age {
+    hidden: yes
     type: sum
     sql: ${age} ;;
   }
