@@ -52,6 +52,11 @@ view: users {
     sql: date_diff(current_date, ${created_date},day)<=90 ;;
   }
 
+  dimension: days_since_signup {
+    type: number
+    sql: date_diff(current_date,${created_date},day) ;;
+  }
+
   dimension: email {
     type: string
     sql: ${TABLE}.email ;;
