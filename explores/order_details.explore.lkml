@@ -3,6 +3,7 @@ include: "/views/base/users.view.lkml"
 include: "/views/base/products.view.lkml"
 
 explore: order_items {
+  group_label: "Tracy BU Training"
   join: users {
     type: inner
     sql_on: ${order_items.user_id}=${users.id} ;;
