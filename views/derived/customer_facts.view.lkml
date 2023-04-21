@@ -19,15 +19,21 @@ view: customer_facts {
   dimension: lifetime_sales {
     type: tier
     tiers: [0, 5, 20, 50, 100, 500, 1000]
-    sql: ${total_sale_price} ;;
+    sql: ${total_lifetime_sales} ;;
     style:  integer
     value_format_name: usd_0
   }
   dimension: total_orders {
     type: number
   }
-  dimension: total_sale_price {
+  dimension: total_lifetime_sales {
     type: number
+    sql: ${TABLE}.total_sale_price ;;
+  }
+  measure: average_lifetime_sales {
+    type: average_distinct
+    sql: ${total_lifetime_sales} ;;
   }
   measure: count {}
+
 }

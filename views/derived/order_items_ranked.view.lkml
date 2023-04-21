@@ -5,7 +5,7 @@ view: orders_ranked {
       from order_items
       group by 1,2
       ),
-order_rank as (
+      order_rank as (
       select user_id, order_id, order_start_date, order_end_date,
         row_number() over (partition by user_id order by order_start_date) as rn
       from order_dates
