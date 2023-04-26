@@ -113,6 +113,10 @@ view: order_items {
     type: count
     drill_fields: [detail*]
   }
+  measure: cumulative_total_sales {
+    type: running_total
+    sql: ${total_sale_price} ;;
+  }
   measure: spend_per_customer {
     type: number
     sql: ${total_sale_price}/nullif(${total_customers},0) ;;
