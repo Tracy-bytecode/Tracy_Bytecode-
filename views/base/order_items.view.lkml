@@ -46,7 +46,7 @@ view: order_items {
 
   dimension: is_complete {
     type: yesno
-    sql: ${status}<>'Cancelled' and ${returned_raw} is not null ;;
+    sql: ${status}<>'Cancelled' and ${returned_raw} is null ;;
   }
 
   dimension: order_id {
@@ -117,6 +117,7 @@ view: order_items {
     type: running_total
     sql: ${total_sale_price} ;;
   }
+
   measure: spend_per_customer {
     type: number
     sql: ${total_sale_price}/nullif(${total_customers},0) ;;
@@ -125,6 +126,13 @@ view: order_items {
   measure: total_customers {
     type:count_distinct
     sql: ${user_id} ;;
+  }
+
+  measure: total_gross_revenue {
+    type: sum
+    sql: ${sale_price} ;;
+    filters: [is_complete: "yes"]
+    value_format_name: usd
   }
 
   measure: total_orders {
