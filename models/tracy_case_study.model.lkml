@@ -1,6 +1,7 @@
 connection: "looker_partner_demo"
 
 include: "/views/base/*.view.lkml"
+include: "/views/derived/*.view.lkml"
 
 explore: order_items {
   group_label: "Tracy BU Training"
@@ -19,3 +20,7 @@ explore: order_items {
 explore: users {
   group_label: "Tracy BU Training"
 }
+
+explore: test_view {}
+
+persist_for: "1 hour"
