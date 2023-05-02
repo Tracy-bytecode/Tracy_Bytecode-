@@ -128,13 +128,6 @@ view: order_items {
     sql: ${user_id} ;;
   }
 
-  measure: total_gross_revenue {
-    type: sum
-    sql: ${sale_price} ;;
-    filters: [is_complete: "yes"]
-    value_format_name: usd
-  }
-
   measure: total_orders {
     type: count_distinct
     sql: ${order_id} ;;
