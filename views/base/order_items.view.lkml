@@ -113,6 +113,13 @@ view: order_items {
     type: count
     drill_fields: [detail*]
   }
+  measure: total_gross_revenue {
+    type: sum
+    sql: ${sale_price} ;;
+    filters: [is_complete: "yes"]
+    value_format_name: usd
+  }
+
   measure: cumulative_total_sales {
     type: running_total
     sql: ${total_sale_price} ;;
