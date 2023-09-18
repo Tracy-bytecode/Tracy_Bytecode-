@@ -1,6 +1,8 @@
 connection: "looker_partner_demo"
 
 include: "/views/base/*.view.lkml"
+include: "/views/derived/*.view.lkml"
+
 
 explore: order_items {
   group_label: "Tracy BU Training"
@@ -14,10 +16,17 @@ explore: order_items {
     sql_on: ${order_items.product_id}=${products.id} ;;
     relationship: many_to_one
   }
+  join: orders_cv {
+    type: inner
+    sql: ;;
+  relationship:one_to_one
+}
 }
 
 explore: users {
   group_label: "Tracy BU Training"
 }
+
+explore: test_derived_table {}
 
 persist_for: "1 hour"

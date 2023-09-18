@@ -11,6 +11,15 @@ view: order_items {
     sql: ${TABLE}.id ;;
   }
 
+  dimension: created_dyn {
+    label_from_parameter: date_grain
+    sql: {% if date_grain._parameter_value=='year' %} ${created_year}
+    {% elsif date_grain._parameter_value== 'month' %} ${created_month}
+    {% elsif date_grain._parameter_value=='week' %} ${created_week}
+    {% elsif date_grain._parameter_value=='day' %} ${created_date}
+    {% else %} NULL {% endif %};;
+  }
+
   dimension_group: created {
     type: time
     timeframes: [
@@ -143,6 +152,27 @@ view: order_items {
     type: sum
     sql: ${sale_price} ;;
     value_format_name: usd
+  }
+
+  parameter: date_grain {
+    type: unquoted
+    default_value: "year"
+    allowed_value: {
+      label: "Day"
+      value: "day"
+    }
+    allowed_value: {
+      label: "Week"
+      value: "week"
+    }
+    allowed_value: {
+      label: "Month"
+      value: "month"
+    }
+    allowed_value: {
+      label: "Year"
+      value: "year"
+    }
   }
 
   # ----- Sets of fields for drilling ------
